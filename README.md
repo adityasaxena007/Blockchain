@@ -1,2 +1,2 @@
 # Blockchain
-Creating a Blockchain from scratch using Python
+Blockchain made from scratch using Python
