@@ -126,9 +126,10 @@ class Blockchain:
             recipient: reciever  of amount
             amount: amount of the transaction
         """
+        if self.hosting_node == None:
+            return False
 
         transaction = Transaction(sender,recipient,amount)
-
         if VerificationUtils.verify_txn(transaction,self.get_balance):
             self.__open_transactions.append(transaction)
             self.save_data()
@@ -136,6 +137,8 @@ class Blockchain:
         return False
 
     def mine_block(self):                                                                   #Function to mine blocks (add completed transactions to the blockchain)
+        if self.hosting_node == None:
+            return False
         last_block = self.__chain[-1]
         hash_str = hash_block(last_block)
         proof = self.proof_of_work()

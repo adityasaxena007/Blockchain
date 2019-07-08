@@ -1,11 +1,12 @@
 from utility.verification import VerificationUtils
 from blockchain import Blockchain
 from uuid import uuid4
+from wallet import Wallet
 class Node:
     def __init__(self):
         #self.id = str(uuid4())
-        self.id = 'aditya'
-        self.blockchain = Blockchain(self.id)
+        self.wallet = Wallet()
+        self.blockchain = None
 
 
     def get_txn_value(self):                                                                #Function to get the transaction value(recepient and the amount)
@@ -32,13 +33,15 @@ class Node:
             print('2: Output the Blockchain')
             print('3: Mine a new block')
             print('4: Verify Transactions')
+            print('5: Create Keys')
+            print('6: Load Keys')
             print('q: Quit')
             user_choice = self.get_user_choice()
 
             if user_choice == '1':
                 tx_data = self.get_txn_value()
                 recipient, amount = tx_data
-                if self.blockchain.add_transaction(recipient = recipient,sender = self.id, amount = amount):
+                if self.blockchain.add_transaction(recipient = recipient,sender = self.wallet.public_key, amount = amount):
                     print('Trasaction Successful')
                 else:
                     print('Trasaction Failed')
@@ -46,18 +49,24 @@ class Node:
                 # Output individual blocks
                 self.print_blockchain_element()
             elif user_choice == '3':
-                self.blockchain.mine_block()
+                if not self.blockchain.mine_block():
+                    print('Mining Failed. Got no Wallet')
             elif user_choice == '4':
                 if VerificationUtils.verify_transactions(self.blockchain.get_open_txns(),self.blockchain.get_balance):
                     print("All Transactions are valid")
                 else:
                     print("There are Invalid Transactions ")
+            elif user_choice == '5':
+                self.wallet.create_keys()
+                self.blockchain = Blockchain(self.wallet.public_key)
+            elif user_choice == '6':
+                pass
             elif user_choice == 'q':
                 break
             else:
                 print('Input was invalid , Please pick a value from the list')
 
-            print('Balance of {} is : {:6.2f} '.format(self.id,self.blockchain.get_balance( )))
+            print('Balance of {} is : {:6.2f} '.format(self.wallet.public_key,self.blockchain.get_balance( )))
 
             if not VerificationUtils.verify_chain(self.blockchain.chain):
                 print('Invalid Blockchain')
